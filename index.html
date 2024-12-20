@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torneo Amistoso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f3f4f6;
+            color: #333;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        main {
+            width: 70%;
+        }
+        aside {
+            width: 25%;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        section {
+            margin-bottom: 30px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        form input {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .btn-sumar {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-sumar:hover {
+            background-color: #45A049;
+            transform: scale(1.1);
+        }
+        .btn-restar {
+            background-color: #F44336;
+            color: white;
+        }
+        .btn-restar:hover {
+            background-color: #D32F2F;
+            transform: scale(1.1);
+        }
+        .participante {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-weight: bold;
+            color: #333;
+            transition: box-shadow 0.3s;
+        }
+        .participante:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .participante span {
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        td {
+            font-weight: bold;
+        }
+        .medalla {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* Animación para el primer lugar */
+        @keyframes firstPlaceCelebration {
+            0% {
+                transform: scale(1);
+                background-color: #fff;
+                box-shadow: none;
+            }
+            50% {
+                transform: scale(1.2);
+                background-color: gold;
+                box-shadow: 0 0 15px gold;
+            }
+            100% {
+                transform: scale(1);
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            }
+        }
+
+        /* Aplicar la animación al primer lugar */
+        .primer-lugar {
+            animation: firstPlaceCelebration 1s ease-out forwards;
+        }
+
+        /* Estilo para el botón de reiniciar */
+        .btn-reiniciar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #ff9800;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-reiniciar:hover {
+            background-color: #fb8c00;
+            transform: scale(1.1);
+        }
+
+        /* Menú desplegable */
+        .menu-reiniciar {
+            display: none;
+            position: absolute;
+            bottom: 50px;
+            right: 0;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            width: 200px;
+            text-align: center;
+        }
+
+        .btn-reiniciar-menu {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .btn-reiniciar-menu:hover {
+            background-color: #fb8c00;
+            transform: scale(1.1);
+        }
+
+        /* Mostrar el menú desplegable */
+        .show-menu {
+            display: block;
+        }
+
+        /* Estilo para el formulario dentro del botón */
+        .formulario-registro {
+            margin-top: 10px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ocultar la tabla de clasificación global inicialmente */
+        #clasificacionGlobal {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Torneo Amistoso</h1>
+
+        <section id="registro">
+            <h2>Lista de Participantes</h2>
+            <div id="tablaPuntajes"></div>
+        </section>
+    </main>
+
+    <aside>
+        <h2>Clasificación Global</h2>
+        <table id="clasificacionGlobal">
+            <thead>
+                <tr>
+                    <th>Posición</th>
+                    <th>Nombre</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </aside>
+
+    <!-- Botón de reiniciar pequeño -->
+    <button class="btn-reiniciar" id="reiniciarBtn">+</button>
+
+    <!-- Menú desplegable con la opción de reiniciar y el formulario de registro -->
+    <div class="menu-reiniciar" id="menuReiniciar">
+        <!-- Formulario para registrar participante -->
+        <div class="formulario-registro" id="formularioRegistro">
+            <input type="text" id="nombre" placeholder="Nombre del Participante" required>
+            <button id="registrarBtn" type="button">Registrar</button>
+        </div>
+        <!-- Botón de reiniciar juego -->
+        <button class="btn-reiniciar-menu" id="reiniciarJuegoBtn">Reiniciar Juego</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reiniciarBtn = document.getElementById('reiniciarBtn');
+            const menuReiniciar = document.getElementById('menuReiniciar');
+            const formularioRegistro = document.getElementById('formularioRegistro');
+            const registrarBtn = document.getElementById('registrarBtn');
+            const tablaPuntajes = document.getElementById('tablaPuntajes');
+            const clasificacionGlobal = document.querySelector('#clasificacionGlobal tbody');
+            let participantes = JSON.parse(localStorage.getItem('participantes')) || [];
+            let lastFirstPlace = null; // Variable para almacenar el último primer lugar
+            let puntosMarcados = false; // Variable para rastrear si ya se ha marcado algún punto
+
+            // Guardar los participantes en el localStorage
+            function guardarParticipantes() {
+                localStorage.setItem('participantes', JSON.stringify(participantes));
+            }
+
+            // Mostrar el menú desplegable y el formulario de registro
+            reiniciarBtn.addEventListener('click', () => {
+                menuReiniciar.classList.toggle('show-menu');
+            });
+
+            // Registrar un nuevo participante
+            registrarBtn.addEventListener('click', () => {
+                const nombre = document.getElementById('nombre').value.trim();
+                if (nombre && !participantes.some(p => p.nombre === nombre)) {
+                    const nuevoParticipante = { nombre, puntos: 0 };
+                    participantes.push(nuevoParticipante);
+                    guardarParticipantes();
+                    actualizarPuntajes();
+                    actualizarClasificacion();
+                } else {
+                    alert('El nombre ya está registrado o está vacío.');
+                }
+            });
+
+            // Función para actualizar la tabla de puntajes
+            function actualizarPuntajes() {
+                tablaPuntajes.innerHTML = '';
+                participantes.forEach(participante => {
+                    const div = document.createElement('div');
+                    div.classList.add('participante');
+                    const spanNombre = document.createElement('span');
+                    spanNombre.textContent = `${participante.nombre}`;
+
+                    const botonesDiv = document.createElement('div');
+                    const btnSumar = document.createElement('button');
+                    btnSumar.textContent = '+';
+                    btnSumar.classList.add('btn-sumar');
+                    btnSumar.addEventListener('click', () => {
+                        participante.puntos++;
+                        puntosMarcados = true; // Cambiar el estado al marcar un punto
+                        guardarParticipantes();
+                        actualizarPuntajes();
+                        actualizarClasificacion();
+                    });
+
+                    const btnRestar = document.createElement('button');
+                    btnRestar.textContent = '-';
+                    btnRestar.classList.add('btn-restar');
+                    btnRestar.addEventListener('click', () => {
+                        if (participante.puntos > 0) {
+                            participante.puntos--;
+                            guardarParticipantes();
+                            actualizarPuntajes();
+                            actualizarClasificacion();
+                        }
+                    });
+
+                    botonesDiv.appendChild(btnSumar);
+                    botonesDiv.appendChild(btnRestar);
+                    div.appendChild(spanNombre);
+                    div.appendChild(botonesDiv);
+                    tablaPuntajes.appendChild(div);
+                });
+            }
+
+            // Función para actualizar la clasificación global
+            function actualizarClasificacion() {
+                // Solo mostrar la clasificación si hay puntos sumados
+                const hayPuntos = participantes.some(p => p.puntos > 0);
+                if (puntosMarcados) {
+                    document.getElementById('clasificacionGlobal').style.display = 'table';
+                }
+
+                clasificacionGlobal.innerHTML = '';
+                const participantesOrdenados = [...participantes]
+                    .filter(p => p.puntos > 0)
+                    .sort((a, b) => b.puntos - a.puntos);
+
+                participantesOrdenados.forEach((participante, index) => {
+                    const tr = document.createElement('tr');
+                    const tdPosicion = document.createElement('td');
+                    const tdNombre = document.createElement('td');
+                    const tdPuntos = document.createElement('td');
+
+                    let medalla = '';
+                    if (index === 0) {
+                        // Medalla de Oro
+                        medalla = '<div class="medalla" style="background-color: gold; color: black;">1</div>';
+                    } else if (index === 1) {
+                        // Medalla de Plata
+                        medalla = '<div class="medalla" style="background-color: silver; color: black;">2</div>';
+                    } else if (index === 2) {
+                        // Medalla de Bronce
+                        medalla = '<div class="medalla" style="background-color: #cd7f32; color: black;">3</div>';
+                    } else {
+                        medalla = `<div class="medalla" style="background-color: #333; color: white;">${index + 1}</div>`;
+                    }
+
+                    tdPosicion.innerHTML = `${medalla}`;
+                    tdNombre.textContent = participante.nombre;
+                    tdPuntos.textContent = participante.puntos;
+
+                    // Añadir la clase de animación al primer lugar
+                    if (index === 0 && lastFirstPlace !== participante.nombre) {
+                        tr.classList.add('primer-lugar');
+                        lastFirstPlace = participante.nombre;
+                    }
+
+                    tr.appendChild(tdPosicion);
+                    tr.appendChild(tdNombre);
+                    tr.appendChild(tdPuntos);
+                    clasificacionGlobal.appendChild(tr);
+                });
+            }
+
+            // Función para reiniciar el juego
+            reiniciarJuegoBtn.addEventListener('click', () => {
+                if (confirm('¿Estás seguro de que quieres reiniciar el juego? Esto eliminará todos los datos.')) {
+                    localStorage.removeItem('participantes');
+                    participantes = [];
+                    lastFirstPlace = null;
+                    puntosMarcados = false; // Restablecer el estado de puntos
+                    actualizarPuntajes();
+                    actualizarClasificacion();
+                    menuReiniciar.classList.remove('show-menu');
+                    document.getElementById('clasificacionGlobal').style.display = 'none'; // Ocultar la tabla
+                }
+            });
+
+            // Cerrar el menú de reinicio si se hace clic fuera de él
+            window.addEventListener('click', (event) => {
+                if (!reiniciarBtn.contains(event.target) && !menuReiniciar.contains(event.target)) {
+                    menuReiniciar.classList.remove('show-menu');
+                }
+            });
+
+            // Llamar la función de inicialización
+            actualizarPuntajes();
+            actualizarClasificacion();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
